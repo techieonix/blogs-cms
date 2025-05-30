@@ -8,6 +8,7 @@ export interface GetRequest extends NextRequest {}
 
 // Get all blogs
 export async function GET(request: GetRequest) {
+    await connectDb();
     const { searchParams } = new URL(request.url);
     const blogId = searchParams.get("id");
 
@@ -30,6 +31,7 @@ export async function GET(request: GetRequest) {
 
 // Create a new blog
 export async function POST(request: Request) {
+    await connectDb();
     let body;
 
     try {
@@ -57,6 +59,7 @@ export async function POST(request: Request) {
 
 // Update a blog by ID
 export async function PUT(request: Request, { params }: { params: { blogId: string } }) {
+    await connectDb();
     const { blogId } = params;
     let body;
 
@@ -86,6 +89,7 @@ export async function PUT(request: Request, { params }: { params: { blogId: stri
 
 // Delete a blog by ID
 export async function DELETE(request: Request, { params }: { params: { blogId: string } }) {
+    await connectDb();
     const { blogId } = params;
 
     try {

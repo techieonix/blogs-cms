@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
+import { connectDb } from "@/src/app/configs/database";
 
-export function DELETE(
+export async function DELETE(
     request: Request,
     { params }: { params: { userid: string } }
-): NextResponse {
+): Promise<NextResponse> {
+    await connectDb();
     const { userid } = params;
     return NextResponse.json({ message: `User ${userid} deleted` }, { status: 200 });
 }

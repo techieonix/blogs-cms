@@ -24,6 +24,7 @@ export interface GetRequest extends NextRequest {}
 
 //create user
 export async function POST(request: Request) {
+  await connectDb();
   let body;
 
   try {
@@ -35,7 +36,10 @@ export async function POST(request: Request) {
   const { name, email, password, role } = body || {};
 
   if (!name || !email || !password || !role) {
-    return NextResponse.json({ error: "All fields are required" }, { status: 400 });
+    return NextResponse.json(
+      { error: "All fields are required" },
+      { status: 400 }
+    );
   }
 
   const user = new User({ name, email, password, role });
@@ -50,7 +54,11 @@ export async function POST(request: Request) {
 }
 
 // Update user
-export async function PUT(request: Request, { params }: { params: { userid: string } }) {
+export async function PUT(
+  request: Request,
+  { params }: { params: { userid: string } }
+) {
+  await connectDb();
   const { userid } = params;
   let body;
 
@@ -63,12 +71,20 @@ export async function PUT(request: Request, { params }: { params: { userid: stri
   const { name, email, password, role } = body || {};
 
   if (!name || !email || !password || !role) {
-    return NextResponse.json({ error: "All fields are required" }, { status: 400 });
+    return NextResponse.json(
+      { error: "All fields are required" },
+      { status: 400 }
+    );
   }
 
   try {
-    const user = await User.findByIdAndUpdate(userid, { name, email, password, role }, { new: true, runValidators: true });
-    if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    const user = await User.findByIdAndUpdate(
+      userid,
+      { name, email, password, role },
+      { new: true, runValidators: true }
+    );
+    if (!user)
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     return NextResponse.json(user, { status: 200 });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
@@ -77,13 +93,21 @@ export async function PUT(request: Request, { params }: { params: { userid: stri
 }
 
 // Delete user
-export async function DELETE(request: Request, { params }: { params: { userid: string } }) {
+export async function DELETE(
+  request: Request,
+  { params }: { params: { userid: string } }
+) {
+  await connectDb();
   const { userid } = params;
 
   try {
     const user = await User.findByIdAndDelete(userid);
-    if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    return NextResponse.json({ message: 'User deleted successfully' }, { status: 200 });
+    if (!user)
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    return NextResponse.json(
+      { message: "User deleted successfully" },
+      { status: 200 }
+    );
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     return NextResponse.json({ error: errorMessage }, { status: 400 });
@@ -91,13 +115,18 @@ export async function DELETE(request: Request, { params }: { params: { userid: s
 }
 
 // Get user(s)
-export async function GET(request: Request, context?: { params?: { userid?: string } }) {
+export async function GET(
+  request: Request,
+  context?: { params?: { userid?: string } }
+) {
+  await connectDb();
   const userid = context?.params?.userid;
 
   try {
     if (userid) {
       const user = await User.findById(userid);
-      if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      if (!user)
+        return NextResponse.json({ error: "User not found" }, { status: 404 });
       return NextResponse.json(user, { status: 200 });
     } else {
       const users = await User.find();
