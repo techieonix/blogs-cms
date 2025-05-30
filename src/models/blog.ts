@@ -10,7 +10,8 @@ const BlogSchema = new Schema({
     category: { type: String, required: true },
     authorName: { type: String, required: true },
     content: { type: BlogContentSchema, required: true },
-    publishedDate: { type: Date, required: true }
+    publishedDate: { type: Date, required: true },
+    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
 })
 
 export const Blog = mongoose.models.Blog || mongoose.model('Blog', BlogSchema);
