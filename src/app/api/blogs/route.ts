@@ -40,13 +40,13 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "Invalid JSON format" }, { status: 400 });
     }
 
-    const { title, content, author } = body || {};
+    const { title, thumbnail, category, authorName, content, published=false, publishedDate, tags=[], status="draft", authorId } = body || {};
 
-    if (!title || !content || !author) {
+    if (!title || !thumbnail || !category || !authorName || !content || !publishedDate || !authorId) {
         return NextResponse.json({ error: "All fields are required" }, { status: 400 });
     }
 
-    const blog = new Blog({ title, content, author });
+    const blog = new Blog({ title, thumbnail, category, authorName, content, published, publishedDate:new Date(publishedDate), updatedDate: new Date(), tags, status, authorId });
 
     try {
         await blog.save();
