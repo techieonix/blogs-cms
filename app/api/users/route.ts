@@ -1,53 +1,59 @@
-import { User } from "@/src/models/user";
-import { NextResponse, NextRequest } from "next/server";
-import { connectDb } from "../../configs/database";
+import { NextResponse } from "next/server";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
 
-connectDb();
+import { User } from "@/models/user";
+import { connectDb } from "@/configs/database";
 
-export interface GetRequest extends NextRequest {}
-
-// export function GET(request: GetRequest): NextResponse {
-//     const users = [
-//         {
-//             id: 1,
-//             name: "John Doe",
-//             email: "john@gmail.com",
-//         },
-//         {
-//             id: 2,
-//             name: "Jane Smith",
-//             email: "jane@gmail.com",
-//         }
-//     ]
-//     return NextResponse.json(users, { status: 200 });
-// }
 
 //create user
 export async function POST(request: Request) {
-  await connectDb();
-  let body;
-
   try {
-    body = await request.json();
-  } catch (error) {
-    return NextResponse.json({ error: "Invalid JSON format" }, { status: 400 });
-  }
+    await connectDb();
 
-  const { name, email, password, role } = body || {};
+    const body = await request.json();
+    const { name, email, password } = body || {};
 
-  if (!name || !email || !password || !role) {
-    return NextResponse.json(
-      { error: "All fields are required" },
-      { status: 400 }
+    if (!name) {
+      return NextResponse.json({ error: "Please provide a name" }, { status: 400 });
+    }
+    if (!email) {
+      return NextResponse.json({ error: "Please provide an email" }, { status: 400 });
+    }
+    if (!password) {
+      return NextResponse.json({ error: "Please provide a password" }, { status: 400 });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const token = jwt.sign(
+      {
+        name, email,
+        role: body.role || "reader"
+      },
+      process.env.SECRET_KEY,
+      { expiresIn: "10d" }
     );
-  }
 
-  const user = new User({ name, email, password, role });
+    const user = new User({ ...body, password: hashedPassword, token });
 
-  try {
     await user.save();
-    return NextResponse.json(user, { status: 201 });
+    return NextResponse.json({
+      message: "User created successfully",
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        username: user.username,
+        email: user.email,
+        role: user.role
+      }
+    }, { status: 201 });
   } catch (error) {
+    console.error(error);
+    if (error.code === 11000) {
+      return NextResponse.json({ error: "This email is already registered. Please use a different email." }, { status: 400 });
+    }
+
     const errorMessage = error instanceof Error ? error.message : String(error);
     return NextResponse.json({ error: errorMessage }, { status: 400 });
   }
