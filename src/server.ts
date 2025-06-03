@@ -20,11 +20,11 @@ app.get('/', (req: HelloRequest, res: HelloResponse) => {
 });
 
 app.use('/api/users', (req: Request, res: Response) => {
-     res.send("User API is working");
+    res.send("User API is working");
 });
 
 app.use('/api/blogs', (req: Request, res: Response) => {
-     res.send("Blog API is working");
+    res.send("Blog API is working");
 });
 
 connectDb();
