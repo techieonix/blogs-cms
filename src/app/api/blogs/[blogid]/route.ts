@@ -1,7 +1,7 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { connectDb } from "@/src/app/configs/database";
 import { Blog } from "@/src/models/blog";
-import { Types } from "mongoose";
+import { ObjectId, Types } from "mongoose";
 
 // Get Blog ID from URL
 function getBlogIdFromParams(params: any) {
@@ -9,20 +9,15 @@ function getBlogIdFromParams(params: any) {
 }
 
 //Edit Blog
-export async function PATCH(request: Request, {params}: {params: {id: string}}) {
+export async function PATCH(request: NextRequest, {params}: {params: {blogid: string}}) {
     await connectDb();
-    const blogId = getBlogIdFromParams(params);
+    const blogId = await params.blogid;
+    
     if (!Types.ObjectId.isValid(blogId)) {
         return NextResponse.json({ error: "Invalid blog ID" }, { status: 400 });
     }
-
-    let updatedData;
-    try {
-        updatedData = await request.json();
-    } catch (error) {
-        return NextResponse.json({ error: "Invalid JSON format" }, { status: 400 });
-    }
-
+ 
+    let updatedData = await request.json();
     updatedData.updatedDate = new Date();
     try {
         const updatedBlog = await Blog.findByIdAndUpdate(blogId, updatedData, { new: true });
