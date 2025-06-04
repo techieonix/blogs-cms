@@ -46,7 +46,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "All fields are required" }, { status: 400 });
     }
 
-    const blog = new Blog({ title, thumbnail, category, authorName, content, published, publishedDate:new Date(publishedDate), updatedDate: new Date(), tags, status, authorId });
+    const blog = new Blog({ title, thumbnail, category, authorName, content, published:true, publishedDate:new Date(publishedDate), updatedDate: new Date(), tags, status:"published", authorId });
 
     try {
         await blog.save();
