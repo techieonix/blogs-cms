@@ -20,13 +20,9 @@ const UserSchema = new Schema({
         enum: ["admin", "writer", "reader"],
         default: "reader"
     },
-    verified: {
-        type: Boolean,
-        default: false
-    },
+    verified: Boolean,
     token: String,
-    forgotPasswordToken: String,
-    verificationToken: String,
+    forgotPasswordToken: String
 }, {
     timestamps: true
 });

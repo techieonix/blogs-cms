@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
 
-import { User } from "@/models/user";
 import { connectDb } from "@/configs/database";
+import sendEmail from "@/utilities/sendEmail";
 
 
 // Signup
@@ -26,45 +25,41 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Please provide a password" }, { status: 400 });
     }
 
-    // Encrypt the password
-    const saltRounds = parseInt(process.env.SALT_ROUNDS || "");
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
-
     // Generate a JWT token
-    const token = jwt.sign(
-      {
-        name, email,
-        role: body.role || "reader"
-      },
+    const jwtToken = jwt.sign(
+      { ...body },
       process.env.SECRET_KEY!,
-      { expiresIn: "10d" }
+      { expiresIn: 15 * 60 } // 15 minutes
     );
 
-    // Create a new user instance
-    const user = new User({ ...body, password: hashedPassword, token });
+    // Create email requirements
+    const verificationLink = `http://localhost:3000/api/auth/verify-email?token=${jwtToken}`;
+    const html = `<div style="font-family: Arial, sans-serif; background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); max-width: 600px; margin: auto;">
+      <h2 style="color: #333;">Welcome to Blog CMS 👋</h2>
+      <p style="color: #555;">Thanks for signing up! Please verify your email address by clicking the button below:</p>
+      <a href="${verificationLink}" style="display: inline-block; margin: 20px 0; padding: 12px 24px; background-color: #4f46e5; color: #ffffff; text-decoration: none; border-radius: 6px;">Verify Email</a>
+      <p style="color: #777;">If the button doesn't work, copy and paste the following link into your browser:</p>
+      <p style="color: #777;"><a href="${verificationLink}" style="color: #4f46e5;">${verificationLink}</a></p>
+      <hr style="margin: 24px 0;">
+      <p style="color: #999; font-size: 12px;">This verification link is valid for <strong>15 minutes</strong>. Please verify your email before it expires.</p>
+      <p style="color: #999; font-size: 12px;">If you didn’t create an account, you can safely ignore this email.</p>
+      <p style="color: #999; font-size: 12px;"><strong>Security Tip:</strong> This verification link is just for you. Please do not share it with anyone.</p>
+    </div>`;
 
-    // Save the user to the database
-    await user.save();
+    // Send the verification email
+    const emailResponse = await sendEmail(email, "Verify your email address", undefined, html);
+    if (!emailResponse.success) {
+      return NextResponse.json({ error: emailResponse.message }, { status: emailResponse.code });
+    }
 
     // Return a success response with user details
-    return NextResponse.json({
-      message: "Signup successfully",
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        username: user.username,
-        email: user.email,
-        role: user.role
-      }
-    }, { status: 201 });
+    return NextResponse.json(
+      { message: "Email sent successfully. Please check your inbox to verify your email address." },
+      { status: 200 }
+    );
+
   } catch (error) {
     console.error(error);
-
-    // Handle duplicate email error
-    if (typeof error === "object" && error !== null && "code" in error && error.code === 11000) {
-      return NextResponse.json({ error: "This email is already registered. Please use a different email." }, { status: 400 });
-    }
 
     // Handle other errors
     const errorMessage = error instanceof Error ? error.message : String(error);

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
 
 import { User } from "@/models/user";
 
@@ -13,9 +14,12 @@ export const PUT = async (req: NextRequest) => {
 
     try {
         // Decode the token
-        const decodedToken = jwt.verify(token, process.env.SECRET_KEY!) as { _id: string, iat: number, exp: number };
-        if (!decodedToken || !decodedToken._id) {
-            return NextResponse.json({ error: "Invalid token" }, { status: 400 });
+        const decodedToken = jwt.verify(token, process.env.SECRET_KEY!) as
+            { name: string, email: string, role: string | null, iat: number, exp: number, password: string };
+
+        // Check if the decoded token is missing
+        if (!decodedToken) {
+            return NextResponse.json({ error: "Token missing" }, { status: 400 });
         }
 
         // Check if the token has expired
@@ -23,29 +27,34 @@ export const PUT = async (req: NextRequest) => {
             return NextResponse.json({ error: "Token has expired" }, { status: 401 });
         }
 
-        // Fetch user details using the decoded token
-        const user = await User.findById(decodedToken._id);
-        if (!user) {
-            return NextResponse.json({ error: "User not found with this ID." }, { status: 404 });
-        }
+        // Encrypt the password
+        const saltRounds = parseInt(process.env.SALT_ROUNDS || "");
+        const hashedPassword = await bcrypt.hash(decodedToken.password, saltRounds);
 
-        // Check if the user is already verified
-        if (user.verified) {
-            return NextResponse.json({ message: "User is already verified." }, { status: 200 });
-        }
 
-        // Update user verification status and remove the verification token
-        user.verified = true;
-        user.verificationToken = undefined;
+        const { iat, exp, ...body } = decodedToken;
+
+        const newToken = jwt.sign(
+            { name: body.name, email: body.email, role: body.role || "reader" },
+            process.env.SECRET_KEY!,
+            { expiresIn: "10d" }
+        );
+
+        // Create a new user instance
+        const user = new User({ ...body, password: hashedPassword, token, verified: true });
+
+        // Save the user to the database
         await user.save();
 
-        return NextResponse.json({ message: "Your email has been successfully verified." }, { status: 200 });
+        // Return a success response with user details
+        return NextResponse.json({ message: "Signup successful. Please log in to continue.", newToken }, { status: 201 });
+
     } catch (error: unknown) {
         console.error(error);
 
-        // Handle specific JWT expiration error
-        if (typeof error === 'object' && error !== null && 'name' in error && error.name === "TokenExpiredError") {
-            return NextResponse.json({ error: "Token has expired" }, { status: 401 });
+        // Handle duplicate email error
+        if (typeof error === "object" && error !== null && "code" in error && error.code === 11000) {
+            return NextResponse.json({ error: "This email is already registered. Please use a different email." }, { status: 400 });
         }
 
         // Handle other errors

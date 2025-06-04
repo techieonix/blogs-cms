@@ -33,11 +33,7 @@ export default async (to: string, subject: string, text?: string, html?: string)
 
     try {
         await transporter.sendMail(message);
-        return {
-            success: true,
-            message: "Email sent successfully!",
-            code: 200
-        };
+        return { success: true };
     } catch (error: any) {
         return {
             success: false,
