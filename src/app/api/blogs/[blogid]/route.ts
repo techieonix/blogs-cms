@@ -4,9 +4,9 @@ import { Blog } from "@/src/models/blog";
 import { ObjectId, Types } from "mongoose";
 
 // Get Blog ID from URL
-function getBlogIdFromParams(params: any) {
-    return params?.id;
-}
+// function getBlogIdFromParams(params: any) {
+//     return params?.id;
+// }
 
 //Edit Blog
 export async function PATCH(request: NextRequest, {params}: {params: {blogid: string}}) {
@@ -35,7 +35,7 @@ export async function PATCH(request: NextRequest, {params}: {params: {blogid: st
 export async function DELETE(request: NextRequest, {params}: {params: {blogid: string}}) {
     await connectDb();
     const blogId = await params.blogid;
-    
+
     if (!Types.ObjectId.isValid(blogId)) {
         return NextResponse.json({ error: "Invalid blog ID" }, { status: 400 });
     }
