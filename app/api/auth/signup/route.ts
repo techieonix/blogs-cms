@@ -29,7 +29,7 @@ export async function POST(request: Request) {
     // Encrypt the password
     const saltRounds = parseInt(process.env.SALT_ROUNDS || "");
     const hashedPassword = await bcrypt.hash(password, saltRounds);
-    
+
     // Generate a JWT token
     const token = jwt.sign(
       {
@@ -62,7 +62,7 @@ export async function POST(request: Request) {
     console.error(error);
 
     // Handle duplicate email error
-    if (error.code === 11000) {
+    if (typeof error === "object" && error !== null && "code" in error && error.code === 11000) {
       return NextResponse.json({ error: "This email is already registered. Please use a different email." }, { status: 400 });
     }
 
