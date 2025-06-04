@@ -32,9 +32,10 @@ export async function PATCH(request: NextRequest, {params}: {params: {blogid: st
 }
 
 // Delete Blog
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, {params}: {params: {blogid: string}}) {
     await connectDb();
-    const blogId = getBlogIdFromParams(params);
+    const blogId = await params.blogid;
+    
     if (!Types.ObjectId.isValid(blogId)) {
         return NextResponse.json({ error: "Invalid blog ID" }, { status: 400 });
     }
