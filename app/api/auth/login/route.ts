@@ -42,7 +42,7 @@ export async function POST(request: Request) {
                 email,
                 role: body.role || "reader"
             },
-            process.env.SECRET_KEY,
+            process.env.SECRET_KEY!,
             { expiresIn: "10d" }
         );
 

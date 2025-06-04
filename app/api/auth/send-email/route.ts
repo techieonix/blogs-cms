@@ -24,8 +24,8 @@ export const POST = async (req: NextRequest) => {
         // Create jwt token
         const jwtToken = jwt.sign(
             { _id: userId, name: user.name, email: user.email, role: user.role },
-            process.env.SECRET_KEY,
-            { expiresIn: "15m" }
+            process.env.SECRET_KEY!,
+            { expiresIn: 15 * 60 } // 15 minutes
         );
 
         const subject = "Verify your email address";
