@@ -1,52 +1,41 @@
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
-
 import { User } from "@/models/user";
-import { connectDB } from '@/configs/database';
 
-
-export const PUT = async (req: NextRequest) => {
+export const PUT = async (request: NextRequest) => {
     // Extract the token from the request query
-    const token = new URL(req.url).searchParams.get("token");
+    const token = new URL(request.url).searchParams.get("token");
     if (!token) {
         return NextResponse.json({ error: "Token is required" }, { status: 400 });
     }
 
+    const { password } = await request.json();
+
     try {
         // Decode the token
-        const decodedToken = jwt.verify(token, process.env.SECRET_KEY!) as
-            { name: string, email: string, role: string | null, iat: number, exp: number, password: string };
-
-        // Check if the decoded token is missing
+        const decodedToken = jwt.verify(token, process.env.SECRET_KEY!) as { id: string };
         if (!decodedToken) {
-            return NextResponse.json({ error: "Token missing" }, { status: 400 });
+            return NextResponse.json({ error: "Invalid or expired token" }, { status: 400 });
+        }
+
+        // Check if the token is valid with datbase
+        const user = await User.findById(decodedToken.id);
+        if (!user || user.forgotPasswordToken !== token) {
+            return NextResponse.json({ error: "You can not update the password with this token. Please request a new verification link." }, { status: 400 });
         }
 
         // Encrypt the password
         const saltRounds = parseInt(process.env.SALT_ROUNDS || "");
-        const hashedPassword = await bcrypt.hash(decodedToken.password, saltRounds);
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-
-        const { iat, exp, ...body } = decodedToken;
-
-        const newToken = jwt.sign(
-            { name: body.name, email: body.email, role: body.role || "reader" },
-            process.env.SECRET_KEY!,
-            { expiresIn: "10d" }
-        );
-
-        // Database connection
-        await connectDB();
-
-        // Create and save a new user instance
-        const user = new User({ ...body, password: hashedPassword, token, verified: true });
+        // Update the user's password and clear the forgot password token
+        user.password = hashedPassword;
+        user.forgotPasswordToken = undefined;
         await user.save();
 
-        // Return a success response with user details
-        return NextResponse.json({ message: "Signup successful. Please log in to continue.", token: newToken }, { status: 201 });
-
-    } catch (error: unknown) {
+        return NextResponse.json({ message: "Password reset successfully. You can now log in with your new password." }, { status: 200 });
+    } catch (error) {
         console.error(error);
 
         // Type guard to check if error is an object with a name property
