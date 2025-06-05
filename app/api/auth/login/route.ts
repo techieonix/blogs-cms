@@ -40,7 +40,7 @@ export async function POST(request: Request) {
             {
                 name: user.name,
                 email,
-                role: body.role || "reader"
+                role: body.role || "viewer"
             },
             process.env.SECRET_KEY!,
             { expiresIn: rememberMe ? "5d" : "1d" }

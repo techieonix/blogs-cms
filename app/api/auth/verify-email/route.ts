@@ -31,7 +31,7 @@ export const PUT = async (req: NextRequest) => {
         const { iat, exp, ...body } = decodedToken;
 
         const newToken = jwt.sign(
-            { name: body.name, email: body.email, role: body.role || "reader" },
+            { name: body.name, email: body.email, role: body.role || "viewer" },
             process.env.SECRET_KEY!,
             { expiresIn: body.rememberMe ? "5d" : "1d" }
         );

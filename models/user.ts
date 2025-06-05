@@ -17,8 +17,8 @@ const UserSchema = new Schema({
     },
     role: {
         type: String,
-        enum: ["admin", "writer", "reader"],
-        default: "reader"
+        enum: ["admin", "author", "viewer"],
+        default: "viewer"
     },
     verified: Boolean,
     token: String,
