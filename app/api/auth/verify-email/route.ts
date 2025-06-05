@@ -47,15 +47,10 @@ export const PUT = async (req: NextRequest) => {
         await user.save();
 
         // Return a success response with user details
-        return NextResponse.json({ message: "Signup successful. Please log in to continue.", newToken }, { status: 201 });
+        return NextResponse.json({ message: "Signup successful. Please log in to continue.", token: newToken }, { status: 201 });
 
     } catch (error: unknown) {
         console.error(error);
-
-        // Handle duplicate email error
-        if (typeof error === "object" && error !== null && "code" in error && error.code === 11000) {
-            return NextResponse.json({ error: "This email is already registered. Please use a different email." }, { status: 400 });
-        }
 
         // Handle other errors
         return NextResponse.json({ error: "Something went wrong. Please try again or contact our support at contact@techieonix.com." }, { status: 500 });

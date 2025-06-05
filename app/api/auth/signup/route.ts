@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 
 import { connectDb } from "@/configs/database";
 import sendEmail from "@/utilities/sendEmail";
+import { User } from "@/models/user";
 
 
 // Signup
@@ -18,11 +19,19 @@ export async function POST(request: Request) {
     if (!name) {
       return NextResponse.json({ error: "Please provide a name" }, { status: 400 });
     }
-    if (!email) {
-      return NextResponse.json({ error: "Please provide an email" }, { status: 400 });
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailRegex.test(email)) {
+      return NextResponse.json({ error: "Please provide a valid email" }, { status: 400 });
     }
     if (!password) {
       return NextResponse.json({ error: "Please provide a password" }, { status: 400 });
+    }
+
+    // Check if the email is already registered
+    const IsEmailRegistered = await User.findOne({ email });
+    if (IsEmailRegistered) {
+      return NextResponse.json({ error: "This email is already registered. Please use a different email." }, { status: 400 });
     }
 
     // Generate a JWT token
