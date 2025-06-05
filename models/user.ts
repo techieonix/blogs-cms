@@ -20,9 +20,18 @@ const UserSchema = new Schema({
         enum: ["admin", "author", "viewer"],
         default: "viewer"
     },
-    verified: Boolean,
-    token: String,
-    forgotPasswordToken: String
+    status: {
+        type: Boolean,
+        default: true
+    },
+    token: {
+        type: String,
+        select: false
+    },
+    forgotPasswordToken: {
+        type: String,
+        select: false
+    }
 }, {
     timestamps: true
 });

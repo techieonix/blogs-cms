@@ -40,7 +40,7 @@ export const PUT = async (req: NextRequest) => {
         await connectDB();
 
         // Create and save a new user instance
-        const user = new User({ ...body, password: hashedPassword, token, verified: true });
+        const user = new User({ ...body, password: hashedPassword, token });
         await user.save();
 
         // Return a success response with user details
