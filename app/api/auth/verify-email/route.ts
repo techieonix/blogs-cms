@@ -22,11 +22,6 @@ export const PUT = async (req: NextRequest) => {
             return NextResponse.json({ error: "Token missing" }, { status: 400 });
         }
 
-        // Check if the token has expired
-        if (decodedToken.iat > decodedToken.exp) {
-            return NextResponse.json({ error: "Token has expired" }, { status: 401 });
-        }
-
         // Encrypt the password
         const saltRounds = parseInt(process.env.SALT_ROUNDS || "");
         const hashedPassword = await bcrypt.hash(decodedToken.password, saltRounds);
@@ -52,7 +47,20 @@ export const PUT = async (req: NextRequest) => {
     } catch (error: unknown) {
         console.error(error);
 
+        // Type guard to check if error is an object with a name property
+        if (error && typeof error === 'object' && 'name' in error) {
+            // Handle token expiration error
+            if (error.name === "TokenExpiredError") {
+                return NextResponse.json({ error: "Token has expired. Please request a new verification link." }, { status: 401 });
+            }
+
+            // Handle invalid token error
+            if (error.name === "JsonWebTokenError") {
+                return NextResponse.json({ error: "Invalid token. Please request a new verification link." }, { status: 400 });
+            }
+        }
+
         // Handle other errors
-        return NextResponse.json({ error: "Something went wrong. Please try again or contact our support at contact@techieonix.com." }, { status: 500 });
+        return NextResponse.json({ error }, { status: 500 });
     }
 };
