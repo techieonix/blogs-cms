@@ -1,12 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDb } from "@/src/app/configs/database";
 import { Blog } from "@/src/models/blog";
-import { ObjectId, Types } from "mongoose";
-
-// Get Blog ID from URL
-// function getBlogIdFromParams(params: any) {
-//     return params?.id;
-// }
+import { Types } from "mongoose";
 
 //Edit Blog
 export async function PATCH(request: NextRequest, {params}: {params: {blogid: string}}) {
