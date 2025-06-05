@@ -1,6 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
-import { connectDb } from "@/src/app/configs/database";
-import { Blog } from "@/src/models/blog";
+import { connectDb } from "@/configs/database";
+import { Blog } from "@/models/blog";
 import mongoose from "mongoose";
 
 // Update a comment by ID

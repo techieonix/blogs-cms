@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { connectDb } from "@/src/app/configs/database";
-import { Blog } from "@/src/models/blog";
+import { connectDb } from "@/configs/database";
+import { Blog } from "@/models/blog";
 import { Types } from "mongoose";
 
 //Edit Blog

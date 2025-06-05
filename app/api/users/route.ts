@@ -1,4 +1,4 @@
-// import { User } from "@/src/models/user";
+// import { User } from "@/models/user";
 // import { NextResponse, NextRequest } from "next/server";
 // import { connectDb } from "../../configs/database";
 

@@ -1,4 +1,4 @@
-import { Blog } from "@/src/models/blog";
+import { Blog } from "@/models/blog";
 import { NextResponse, NextRequest } from "next/server";
 import { connectDb } from "../../../configs/database";
 
