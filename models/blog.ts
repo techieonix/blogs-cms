@@ -20,7 +20,8 @@ const BlogSchema = new Schema({
     comments: [{
         userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
         comment: { type: String, required: true },
-        createdAt: { type: Date, default: Date.now }
+        createdAt: { type: Date, default: Date.now },
+        updatedAt: { type: Date }
     }],
     shares: { type: Number, default: 0 },
     status: {
