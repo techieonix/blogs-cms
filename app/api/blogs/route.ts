@@ -1,6 +1,6 @@
 import { Blog } from "@/src/models/blog";
 import { NextResponse, NextRequest } from "next/server";
-import { connectDb } from "../../configs/database";
+import { connectDb } from "../../../configs/database";
 
 connectDb();
 
