@@ -13,7 +13,7 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-export default async (to: string, subject: string, text?: string, html?: string) => {
+export default async (to: string, subject: string, html?: string, text?: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(to)) {
         return {

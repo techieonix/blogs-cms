@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
 import { User } from "@/models/user";
+import { connectDB } from '@/configs/database';
 
 
 export const PUT = async (req: NextRequest) => {
@@ -35,10 +36,11 @@ export const PUT = async (req: NextRequest) => {
             { expiresIn: "10d" }
         );
 
-        // Create a new user instance
-        const user = new User({ ...body, password: hashedPassword, token, verified: true });
+        // Database connection
+        await connectDB();
 
-        // Save the user to the database
+        // Create and save a new user instance
+        const user = new User({ ...body, password: hashedPassword, token, verified: true });
         await user.save();
 
         // Return a success response with user details

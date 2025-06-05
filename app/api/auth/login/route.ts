@@ -3,13 +3,13 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
 import { User } from "@/models/user";
-import { connectDb } from "@/configs/database";
+import { connectDB } from "@/configs/database";
 
 
 // Login
 export async function POST(request: Request) {
     try {
-        await connectDb();
+        await connectDB();
 
         // Parse the request body
         const body = await request.json();

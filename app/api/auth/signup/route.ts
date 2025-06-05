@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 
-import { connectDb } from "@/configs/database";
+import { connectDB } from "@/configs/database";
 import sendEmail from "@/utilities/sendEmail";
 import { User } from "@/models/user";
 
@@ -9,7 +9,7 @@ import { User } from "@/models/user";
 // Signup
 export async function POST(request: Request) {
   try {
-    await connectDb();
+    await connectDB();
 
     // Parse the request body
     const body = await request.json();
@@ -52,11 +52,11 @@ export async function POST(request: Request) {
       <hr style="margin: 24px 0;">
       <p style="color: #999; font-size: 12px;">This verification link is valid for <strong>15 minutes</strong>. Please verify your email before it expires.</p>
       <p style="color: #999; font-size: 12px;">If you didn’t create an account, you can safely ignore this email.</p>
-      <p style="color: #999; font-size: 12px;"><strong>Security Tip:</strong> This verification link is just for you. Please do not share it with anyone.</p>
+      <p style="color: #ff3c3c; font-size: 12px;"><strong>Security Tip:</strong> This verification link is just for you. Please do not share it with anyone.</p>
     </div>`;
 
     // Send the verification email
-    const emailResponse = await sendEmail(email, "Verify your email address", undefined, html);
+    const emailResponse = await sendEmail(email, "Verify your email address", html);
     if (!emailResponse.success) {
       return NextResponse.json({ error: emailResponse.message }, { status: emailResponse.code });
     }
@@ -81,7 +81,7 @@ export async function POST(request: Request) {
 //   request: Request,
 //   { params }: { params: { userid: string } }
 // ) {
-//   await connectDb();
+//   await connectDB();
 //   const { userid } = params;
 //   let body;
 
@@ -120,7 +120,7 @@ export async function POST(request: Request) {
 //   request: Request,
 //   { params }: { params: { userid: string } }
 // ) {
-//   await connectDb();
+//   await connectDB();
 //   const { userid } = params;
 
 //   try {
@@ -142,7 +142,7 @@ export async function POST(request: Request) {
 //   request: Request,
 //   context?: { params?: { userid?: string } }
 // ) {
-//   await connectDb();
+//   await connectDB();
 //   const userid = context?.params?.userid;
 
 //   try {
