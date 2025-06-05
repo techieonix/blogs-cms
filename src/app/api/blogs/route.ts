@@ -30,7 +30,7 @@ connectDb();
 // }
 
 // Create a new blog
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
     await connectDb();
     let body;
 
