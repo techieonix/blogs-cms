@@ -31,28 +31,26 @@ connectDb();
 
 // Create a new blog
 export async function POST(request: NextRequest) {
-    await connectDb();
-    let body;
+    const body = await request.json();
 
     try {
-        body = await request.json();
-    } catch (error) {
-        return NextResponse.json({ error: "Invalid JSON format" }, { status: 400 });
-    }
+        // Database connection
+        await connectDb();
 
-    const { title, thumbnail, category, authorName, content, published=false, publishedDate, tags=[], status="draft", authorId } = body || {};
-
-    if (!title || !thumbnail || !category || !authorName || !content || !publishedDate || !authorId) {
-        return NextResponse.json({ error: "All fields are required" }, { status: 400 });
-    }
-
-    const blog = new Blog({ title, thumbnail, category, authorName, content, published:true, publishedDate:new Date(publishedDate), updatedDate: new Date(), tags, status:"published", authorId });
-
-    try {
+        // Create and save a new blog
+        const blog = new Blog(body);
         await blog.save();
-        return NextResponse.json(blog, { status: 201 });
+
+        // Return a success response
+        return NextResponse.json({ message: "Blog created successfully" }, { status: 201 });
     } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
-        return NextResponse.json({ error: errorMessage }, { status: 400 });
+        console.error(error);
+
+        // Handle validation errors
+        if (error instanceof Error && error.name === "ValidationError") {
+            return NextResponse.json({ error: (error as Error).message.split(": ").at(-1) }, { status: 400 });
+        }
+
+        return NextResponse.json({ error: "Something went wrong. Please try again later or contact support at contact@techieonix.com." }, { status: 500 });
     }
 }
