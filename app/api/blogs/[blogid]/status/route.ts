@@ -4,7 +4,6 @@ import { connectDb } from "@/configs/database";
 import { Blog } from "@/models/blog";
 
 export async function PUT(request: NextRequest, { params }: { params: { blogid: string } }) {
-  await connectDb();
   const blogId = params.blogid;
 
   if (!mongoose.Types.ObjectId.isValid(blogId)) {
@@ -20,23 +19,31 @@ export async function PUT(request: NextRequest, { params }: { params: { blogid: 
 
   const { status } = body;
 
-  const validStatuses = ["Draft", "Published", "Archived"];
-  if (!validStatuses.includes(status)) {
-    return NextResponse.json({ error: "Invalid status" }, { status: 400 });
-  }
-
   try {
+    // Database connection
+    await connectDb();
+
+    // Find the blog 
     const blog = await Blog.findById(blogId);
     if (!blog) {
       return NextResponse.json({ error: "Blog not found" }, { status: 404 });
     }
+
+    // Update the blog status
     blog.status = status;
     await blog.save();
-    return NextResponse.json({ message: "Blog status updated successfully" }, { status: 200 }
-    );
-  } catch (error) {
-    console.error("Error updating blog status:", error);
-    return NextResponse.json({ error: "Failed to update blog status" }, { status: 500 }
-    );
+
+    // Return success response
+    return NextResponse.json({ message: "Blog status updated successfully" }, { status: 200 });
+  } catch (error: any) {
+    console.error(error);
+
+    // Validation error handling
+    if (error.name === "ValidationError") {
+      return NextResponse.json({ error: error.message.split(": ").at(-1) }, { status: 400 });
+    }
+
+    // Handle other errors
+    return NextResponse.json({ error: "Something went wrong. Please try again later or contact support at contact@techieonix.com." }, { status: 500 });
   }
 }
