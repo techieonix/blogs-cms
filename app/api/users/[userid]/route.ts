@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { connectDb } from "@/configs/database";
+import { connectDB } from "@/configs/database";
 import { Blog } from "@/models/blog";
 
-export async function GET(request: NextRequest, {params}: {params: {userid: string}}) {
-  await connectDb();
+export async function GET(request: NextRequest, { params }: { params: { userid: string } }) {
+  await connectDB();
   const userid = params.userid;
 
   if (!userid) {
