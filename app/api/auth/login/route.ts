@@ -13,7 +13,7 @@ export async function POST(request: Request) {
 
         // Parse the request body
         const body = await request.json();
-        const { email, password } = body || {};
+        const { email, password, rememberMe } = body || {};
 
         // Validate required fields
         if (!email) {
@@ -43,7 +43,7 @@ export async function POST(request: Request) {
                 role: body.role || "reader"
             },
             process.env.SECRET_KEY!,
-            { expiresIn: "10d" }
+            { expiresIn: rememberMe ? "5d" : "1d" }
         );
 
         // Update user token

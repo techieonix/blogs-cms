@@ -16,7 +16,7 @@ export const PUT = async (req: NextRequest) => {
     try {
         // Decode the token
         const decodedToken = jwt.verify(token, process.env.SECRET_KEY!) as
-            { name: string, email: string, role: string | null, iat: number, exp: number, password: string };
+            { name: string, email: string, role: string | null, iat: number, exp: number, password: string, rememberMe: boolean };
 
         // Check if the decoded token is missing
         if (!decodedToken) {
@@ -33,7 +33,7 @@ export const PUT = async (req: NextRequest) => {
         const newToken = jwt.sign(
             { name: body.name, email: body.email, role: body.role || "reader" },
             process.env.SECRET_KEY!,
-            { expiresIn: "10d" }
+            { expiresIn: body.rememberMe ? "5d" : "1d" }
         );
 
         // Database connection
