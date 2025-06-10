@@ -1,9 +1,5 @@
 import { model, models, Schema } from "mongoose";
-
-const BlogContentSchema: Schema = new Schema({
-    text: { type: String, required: true },
-    images: [{ type: String }]
-});
+import { BlogContentSchema } from "./blogContent";
 
 const BlogSchema = new Schema({
     title: {
