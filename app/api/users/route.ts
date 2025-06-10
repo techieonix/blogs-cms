@@ -5,13 +5,16 @@ import auth from "@/middlewares/auth";
 import { User } from "@/models/user";
 
 
+const middleware = auth(["admin"]);
+
 export const GET = async (request: NextRequest) => {
     try {
         // Database connection
         await connectDB();
 
         // Authentication middleware
-        await auth(request, ["admin"]);
+        const authResponse = await middleware(request);
+        if (!authResponse.success) return authResponse.response;
 
         // Fetch all users
         const users = await User.find();

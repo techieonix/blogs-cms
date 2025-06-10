@@ -6,7 +6,7 @@ import { User } from "@/models/user";
 import { connectDB } from '@/configs/database';
 
 
-export const PUT = async (req: NextRequest) => {
+export const POST = async (req: NextRequest) => {
     // Extract the token from the request query
     const token = new URL(req.url).searchParams.get("token");
     if (!token) {
@@ -16,7 +16,7 @@ export const PUT = async (req: NextRequest) => {
     try {
         // Decode the token
         const decodedToken = jwt.verify(token, process.env.SECRET_KEY!) as
-            { name: string, email: string, role: string | null, iat: number, exp: number, password: string, rememberMe: boolean };
+            { name: string, email: string, role: string | null, iat: number, exp: number, password: string };
 
         // Check if the decoded token is missing
         if (!decodedToken) {
@@ -30,21 +30,15 @@ export const PUT = async (req: NextRequest) => {
 
         const { iat, exp, ...body } = decodedToken;
 
-        const newToken = jwt.sign(
-            { name: body.name, email: body.email, role: body.role || "viewer" },
-            process.env.SECRET_KEY!,
-            { expiresIn: body.rememberMe ? "5d" : "1d" }
-        );
-
         // Database connection
         await connectDB();
 
         // Create and save a new user instance
-        const user = new User({ ...body, password: hashedPassword, token });
+        const user = new User({ ...body, password: hashedPassword });
         await user.save();
 
         // Return a success response with user details
-        return NextResponse.json({ message: "Signup successful. Please log in to continue.", token: newToken }, { status: 201 });
+        return NextResponse.json({ message: "Signup successful. Please log in to continue." }, { status: 201 });
 
     } catch (error: unknown) {
         console.error(error);

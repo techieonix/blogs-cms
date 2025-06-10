@@ -20,7 +20,7 @@ const UserSchema = new Schema({
         enum: ["admin", "author", "viewer"],
         default: "viewer"
     },
-    status: {
+    isActive: {
         type: Boolean,
         default: true
     },

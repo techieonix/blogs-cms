@@ -1,42 +1,51 @@
-import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+import { NextResponse, type NextRequest } from 'next/server';
+import jwt from 'jsonwebtoken';
 
+export default function (allowedRoles: string[]) {
+    return async (request: NextRequest) => {
+        const token = request.headers.get("Authorization")?.split(" ")[1];
 
-export default async function (req: NextRequest, allowedRoles: string[]) {
-    // Extract the token from headers
-    const token = req.headers.get("Authorization")?.replace("Bearer ", "");
-    console.log(token);
-    if (!token) {
-        return NextResponse.json({ message: "No token provided. Please log in to continue." }, { status: 401 });
-    }
-
-    try {
-        const decodedToken = jwt.verify(token, process.env.JWT_SECRET!) as { id: string, role: string };
-        if (allowedRoles && !allowedRoles.includes(decodedToken.role)) {
-            return NextResponse.json({ message: "You do not have permission to access this resource." }, { status: 403 });
+        // No token block
+        if (!token) {
+            return {
+                success: false,
+                response: NextResponse.json({ message: "No token provided. Please log in to continue." }, { status: 401 })
+            };
         }
 
-        req.headers.set("user", JSON.stringify(decodedToken));
+        try {
+            const decoded = jwt.verify(token, process.env.SECRET_KEY!) as {
+                id: string;
+                role: string;
+                name: string;
+                email: string;
+            };
 
-        // Continue normally
-        return NextResponse.next();
-    } catch (error) {
-        console.error(error);
-
-        // Type guard to check if error is an object with a name property
-        if (error && typeof error === 'object' && 'name' in error) {
-            // Handle token expiration error
-            if (error.name === "TokenExpiredError") {
-                return NextResponse.json({ error: "Token has expired. Please request a new verification link." }, { status: 401 });
+            // Role validation
+            if (!allowedRoles.includes(decoded.role)) {
+                return {
+                    success: false,
+                    response: NextResponse.json({ message: "You do not have permission to access this resource." }, { status: 403 })
+                };
             }
 
-            // Handle invalid token error
-            if (error.name === "JsonWebTokenError") {
-                return NextResponse.json({ error: "Invalid token. Please request a new verification link." }, { status: 400 });
-            }
+            console.log("Authentication successful");
+            return {
+                success: true,
+                user: {
+                    id: decoded.id,
+                    name: decoded.name,
+                    email: decoded.email,
+                    role: decoded.role
+                }
+            };
+
+        } catch (error) {
+            console.error(error);
+            return {
+                success: false,
+                response: NextResponse.json({ message: "Invalid or expired token" }, { status: 401 })
+            };
         }
-
-        // Handle other errors
-        return NextResponse.json({ message: "Something went wrong. Please try again later or contact support at contact@techieonix.com" }, { status: 500 });
-    }
+    };
 };
