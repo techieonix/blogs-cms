@@ -29,9 +29,10 @@ export const PUT = async (request: NextRequest) => {
         const saltRounds = parseInt(process.env.SALT_ROUNDS || "");
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-        // Update the user's password and clear the forgot password token
+        // Update the user's password and clear the tokens
         user.password = hashedPassword;
         user.forgotPasswordToken = undefined;
+        user.token = undefined;
         await user.save();
 
         return NextResponse.json({ message: "Password reset successfully. You can now log in with your new password." }, { status: 200 });
