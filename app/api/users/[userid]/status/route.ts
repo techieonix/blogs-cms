@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import auth from "@/middlewares/auth";
-import { connectDB } from "@/configs/database";
 import { User } from "@/models/user";
 
 
@@ -25,9 +24,6 @@ export const PATCH = async (request: NextRequest, { params }: { params: { userId
         if (isActive === null || isActive === undefined || typeof isActive !== "boolean") {
             return NextResponse.json({ error: "Please provide the valid status" }, { status: 400 });
         }
-
-        // Database connection
-        await connectDB();
 
         // Update user by ID
         const user = await User.findByIdAndUpdate(userId, { $set: { isActive } }, { new: true });

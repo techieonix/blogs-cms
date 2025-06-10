@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import auth from "@/middlewares/auth";
-import { connectDB } from "@/configs/database";
 import { User } from "@/models/user";
 
 
@@ -25,9 +24,6 @@ export const PATCH = async (request: NextRequest, { params }: { params: { userId
         if (!role || typeof role !== "string" || role.trim() === "") {
             return NextResponse.json({ error: "Please provide a valid role" }, { status: 400 });
         }
-
-        // Database connection
-        await connectDB();
 
         // Update user by ID
         const user = await User.findByIdAndUpdate(userId, { $set: { role } }, { new: true });

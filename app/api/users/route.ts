@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { connectDB } from "@/configs/database";
 import auth from "@/middlewares/auth";
 import { User } from "@/models/user";
 
@@ -12,9 +11,6 @@ export const GET = async (request: NextRequest) => {
         // Authentication middleware
         const authResponse = await middleware(request);
         if (!authResponse.success) return authResponse.response;
-
-        // Database connection
-        await connectDB();
 
         // Fetch all users
         const users = await User.find();
