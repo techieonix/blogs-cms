@@ -1,5 +1,5 @@
 import { model, models, Schema } from "mongoose";
-import { BlogContentSchema } from "./blogContent";
+import { BlogContentSchema } from "@/models/blogContent";
 
 const BlogSchema = new Schema({
     title: {
