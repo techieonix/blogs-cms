@@ -14,7 +14,7 @@ const BlogSchema = new Schema({
     },
     content: {
         type: BlogContentSchema,
-        // required: true
+        required: [true, "Please provide the content for the blog post"]
     },
     publishedDate: Date,
     lastUpdateDate: Date,

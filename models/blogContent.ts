@@ -41,6 +41,11 @@ export const BlogContentSchema = new Schema({
         type: String,
         buttonLabel: String,
         buttonUrl: String
+    },
+    blog: {
+        type: Schema.Types.ObjectId,
+        ref: "Blog",
+        required: [true, "Please provide the blog post this content belongs to"]
     }
 });
 
