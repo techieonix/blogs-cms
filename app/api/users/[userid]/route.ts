@@ -1,30 +1,86 @@
 import { NextRequest, NextResponse } from "next/server";
+
+import auth from "@/middlewares/auth";
 import { connectDB } from "@/configs/database";
-import { Blog } from "@/models/blog";
+import { User } from "@/models/user";
 
-export async function GET(request: NextRequest, { params }: { params: { userid: string } }) {
-  await connectDB();
-  const userid = params.userid;
 
-  if (!userid) {
-    return NextResponse.json({ error: "User ID is required" }, { status: 400 });
-  }
+const middleware = auth(["admin"]);
 
-  const userBlogs = await Blog.find({ authorId: userid });
-  if (userBlogs.length === 0) {
-    return NextResponse.json(
-      { message: "No blogs found for this user" },
-      { status: 404 }
-    );
-  }
-  return NextResponse.json(userBlogs, { status: 200 });
-}
 
-// export async function DELETE(
-//     request: Request,
-//     { params }: { params: { userid: string } }
-// ): Promise<NextResponse> {
-//     await connectDb();
-//     const { userid } = params;
-//     return NextResponse.json({ message: `User ${userid} deleted` }, { status: 200 });
-// }
+// Get User by ID
+export const GET = async (request: NextRequest, { params }: { params: { userId: string } }) => {
+    // Extract the user ID and validate it
+    const { userId } = await params;
+    if (!userId || userId.trim() === "") {
+        return NextResponse.json({ error: "Please provide a valid user ID" }, { status: 400 });
+    }
+
+    // Authentication middleware
+    const authResponse = await middleware(request);
+    if (!authResponse.success) return authResponse.response;
+
+    try {
+        // Database connection
+        await connectDB();
+
+        // Fetch user by ID
+        const user = await User.findById(userId);
+        if (!user) {
+            return NextResponse.json({ error: "No user found with this ID" }, { status: 404 });
+        }
+
+        // Return the user data
+        return NextResponse.json({
+            message: "User fetched successfully",
+            user
+        }, { status: 200 });
+    } catch (error: any) {
+        console.error(error);
+
+        // Handle ObjectId cast errors
+        if (error.name === "CastError" && error.kind === "ObjectId") {
+            return NextResponse.json({ error: "Invalid user ID format" }, { status: 400 });
+        }
+
+        // Handle other errors
+        return NextResponse.json({ error: "Something went wrong. Please try again later or contact support at contact@techieonix.com" }, { status: 500 });
+    }
+};
+
+
+// Delete User by ID
+export const DELETE = async (request: NextRequest, { params }: { params: { userId: string } }) => {
+    // Extract the user ID and validate it
+    const { userId } = await params;
+    if (!userId || userId.trim() === "") {
+        return NextResponse.json({ error: "Please provide a valid user ID" }, { status: 400 });
+    }
+
+    // Authentication middleware
+    const authResponse = await middleware(request);
+    if (!authResponse.success) return authResponse.response;
+
+    try {
+        // Database connection
+        await connectDB();
+
+        const user = await User.findByIdAndDelete(userId);
+        if (!user) {
+            return NextResponse.json({ error: "No user found with this ID" }, { status: 404 });
+        }
+
+        // Return success response
+        return NextResponse.json({ message: "User deleted successfully" }, { status: 200 });
+    } catch (error: any) {
+        console.error(error);
+
+        // Handle ObjectId cast errors
+        if (error.name === "CastError" && error.kind === "ObjectId") {
+            return NextResponse.json({ error: "Invalid user ID format" }, { status: 400 });
+        }
+
+        // Handle other errors
+        return NextResponse.json({ error: "Something went wrong. Please try again later or contact support at contact@techieonix.com" }, { status: 500 });
+    }
+};

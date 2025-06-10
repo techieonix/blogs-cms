@@ -9,12 +9,12 @@ const middleware = auth(["admin"]);
 
 export const GET = async (request: NextRequest) => {
     try {
-        // Database connection
-        await connectDB();
-
         // Authentication middleware
         const authResponse = await middleware(request);
         if (!authResponse.success) return authResponse.response;
+
+        // Database connection
+        await connectDB();
 
         // Fetch all users
         const users = await User.find();

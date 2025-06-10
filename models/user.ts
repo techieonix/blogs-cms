@@ -5,6 +5,8 @@ const UserSchema = new Schema({
         type: String,
         required: true
     },
+    bio: String,
+    avatar: String,
     email: {
         type: String,
         required: true,
