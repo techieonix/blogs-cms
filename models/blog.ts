@@ -1,9 +1,5 @@
 import { model, models, Schema } from "mongoose";
-
-const BlogContentSchema: Schema = new Schema({
-    text: { type: String, required: true },
-    images: [{ type: String }]
-});
+import { BlogContentSchema } from "@/models/blogContent";
 
 const BlogSchema = new Schema({
     title: {
@@ -18,7 +14,7 @@ const BlogSchema = new Schema({
     },
     content: {
         type: BlogContentSchema,
-        // required: true
+        required: [true, "Please provide the content for the blog post"]
     },
     publishedDate: Date,
     lastUpdateDate: Date,
