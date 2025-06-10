@@ -1,5 +1,5 @@
 import { NextResponse, NextRequest } from "next/server";
-import { connectDb } from "@/configs/database";
+import { connectDB } from "@/configs/database";
 import { Blog } from "@/models/blog";
 import mongoose from "mongoose";
 
@@ -7,7 +7,7 @@ export async function POST(
   request: NextRequest,
   { params }: { params: { blogid: string } }
 ) {
-  await connectDb();
+  await connectDB();
 
   const blogId = await params.blogid;
 

@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
-import { connectDb } from "@/configs/database";
+
+import { connectDB } from "@/configs/database";
 import { Blog } from "@/models/blog";
+
 
 export async function PUT(request: NextRequest, { params }: { params: { blogid: string } }) {
   const blogId = params.blogid;
@@ -21,7 +23,7 @@ export async function PUT(request: NextRequest, { params }: { params: { blogid: 
 
   try {
     // Database connection
-    await connectDb();
+    await connectDB();
 
     // Find the blog 
     const blog = await Blog.findById(blogId);
@@ -46,4 +48,4 @@ export async function PUT(request: NextRequest, { params }: { params: { blogid: 
     // Handle other errors
     return NextResponse.json({ error: "Something went wrong. Please try again later or contact support at contact@techieonix.com." }, { status: 500 });
   }
-}
+};

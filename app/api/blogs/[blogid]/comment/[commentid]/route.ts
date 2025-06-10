@@ -1,5 +1,5 @@
 import { NextResponse, NextRequest } from "next/server";
-import { connectDb } from "@/configs/database";
+import { connectDB } from "@/configs/database";
 import { Blog } from "@/models/blog";
 import mongoose from "mongoose";
 
@@ -8,7 +8,7 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: { blogid: string; commentid: string } }
 ) {
-  await connectDb();
+  await connectDB();
 
   const blogId = params.blogid;
   const commentId = params.commentid;
@@ -74,7 +74,7 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: { blogid: string; commentid: string } }
 ) {
-  await connectDb();
+  await connectDB();
 
   const blogId = params.blogid;
   const commentId = params.commentid;

@@ -1,8 +1,39 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Types } from "mongoose";
 
-import { connectDb } from "@/configs/database";
+import { connectDB } from "@/configs/database";
 import { Blog } from "@/models/blog";
+
+
+// Get Blog by ID
+export async function GET(request: NextRequest, { params }: { params: { blogid: string } }) {
+    // Extract the blog ID
+    const blogId = await params.blogid;
+    if (!Types.ObjectId.isValid(blogId)) {
+        return NextResponse.json({ error: "Invalid blog ID" }, { status: 400 });
+    }
+
+    try {
+        // Database connection
+        await connectDB();
+
+        // Fetch the blog by ID
+        const blog = await Blog.findById(blogId);
+        if (!blog) {
+            return NextResponse.json({ error: "No blog found with this ID" }, { status: 404 });
+        }
+
+        // Return the blog data
+        return NextResponse.json({
+            message: "Blog fetched successfully",
+            blog
+        }, { status: 200 });
+    } catch (error) {
+        console.error(error);
+        return NextResponse.json({ error: "Something went wrong. Please try again later or contact support at contact@techieonix.com" }, { status: 500 });
+    }
+}
+
 
 //Edit Blog
 export async function PATCH(request: NextRequest, { params }: { params: { blogid: string } }) {
@@ -16,7 +47,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { blogid
     updatedData.lastUpdateDate = new Date(Date.now());
     try {
         // Database connection
-        await connectDb();
+        await connectDB();
 
         // Update the blog
         const updatedBlog = await Blog.findByIdAndUpdate(blogId, updatedData, { new: true });
@@ -34,6 +65,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { blogid
     }
 }
 
+
 // Delete Blog
 export async function DELETE(_: NextRequest, { params }: { params: { blogid: string } }) {
     const blogId = await params.blogid;
@@ -44,7 +76,7 @@ export async function DELETE(_: NextRequest, { params }: { params: { blogid: str
 
     try {
         // Database connection
-        await connectDb();
+        await connectDB();
 
         // Delete the blog
         const deletedBlog = await Blog.findByIdAndDelete(blogId);

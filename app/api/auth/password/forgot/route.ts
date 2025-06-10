@@ -34,7 +34,7 @@ export const PUT = async (request: Request) => {
         );
 
         // Create email requirements
-        const resetLink = `http://localhost:3000/api/auth/reset-password?token=${forgotPasswordToken}`;
+        const resetLink = `http://localhost:3000/api/auth/password/reset?token=${forgotPasswordToken}`;
         const html = `<div style="font-family: Arial, sans-serif; background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); max-width: 600px; margin: auto;">
   <h2 style="color: #333;">Reset Your Password</h2>
   <p style="color: #555;">We received a request to reset your password. Click the button below to set a new one:</p>

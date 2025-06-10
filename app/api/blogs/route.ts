@@ -1,33 +1,30 @@
-import { Blog } from "@/models/blog";
 import { NextResponse, NextRequest } from "next/server";
-import { connectDb } from "../../../configs/database";
+import { Blog } from "@/models/blog";
+import { connectDB } from "@/configs/database";
 
-connectDb();
-
-// export interface GetRequest extends NextRequest {}
 
 // Get all blogs
-// export async function GET(request: GetRequest) {
-//     await connectDb();
-//     const { searchParams } = new URL(request.url);
-//     const blogId = searchParams.get("id");
+export async function GET(request: NextResponse) {
+    try {
+        // Database connection
+        await connectDB();
 
-//     try {
-//         if (blogId) {
-//             const blog = await Blog.findById(blogId);
-//             if (!blog) {
-//                 return NextResponse.json({ error: "Blog not found" }, { status: 404 });
-//             }
-//             return NextResponse.json(blog, { status: 200 });
-//         } else {
-//             const blogs = await Blog.find();
-//             return NextResponse.json(blogs, { status: 200 });
-//         }
-//     } catch (error) {
-//         const errorMessage = error instanceof Error ? error.message : String(error);
-//         return NextResponse.json({ error: errorMessage }, { status: 500 });
-//     }
-// }
+        // Fetch all blogs
+        const blogs = await Blog.find();
+        if (!blogs || blogs.length === 0) {
+            return NextResponse.json({ message: "No blogs found" }, { status: 404 });
+        }
+
+        // Return the blogs
+        return NextResponse.json({
+            message: "Blogs fetched successfully",
+            blogs
+        }, { status: 200 });
+    } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        return NextResponse.json({ error: errorMessage }, { status: 500 });
+    }
+}
 
 // Create a new blog
 export async function POST(request: NextRequest) {
@@ -35,7 +32,7 @@ export async function POST(request: NextRequest) {
 
     try {
         // Database connection
-        await connectDb();
+        await connectDB();
 
         // Create and save a new blog
         const blog = new Blog(body);
