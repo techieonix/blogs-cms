@@ -33,9 +33,7 @@ export const PATCH = async (request: NextRequest, { params }: { params: { userId
         }
 
         // Return the updated user data
-        return NextResponse.json({
-            message: "The user role has been updated successfully",
-        }, { status: 200 });
+        return NextResponse.json({ message: "The user role has been updated successfully", }, { status: 200 });
     } catch (error: any) {
         console.error(error);
 

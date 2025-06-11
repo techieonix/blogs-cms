@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 
+import { connectDB } from "@/configs/database";
+import { User } from "@/models/user";
+
 
 export default async function (request: NextRequest, userId: string) {
     try {
@@ -30,24 +33,21 @@ export default async function (request: NextRequest, userId: string) {
         }
 
         // Database Connection
-        // await connectDB();
-        // const user = await User.findOne({ _id: decoded.id, isActive: true });
-        // if (!user) {
-        //     return {
-        //         success: false,
-        //         response: NextResponse.json({ message: "User not found or inactive. Please log in again to continue or contact support at" }, { status: 404 })
-        //     }
-        // }
+        await connectDB();
+
+        // Check if user exists and is active
+        const user = await User.findOne({ _id: decoded.id, isActive: true });
+        if (!user) {
+            return {
+                success: false,
+                response: NextResponse.json({ message: "User not found or inactive. Please log in again to continue or contact support at contact@techieonix.com." }, { status: 404 })
+            };
+        }
 
         console.log("Authentication successful");
         return {
             success: true,
-            user: {
-                id: decoded.id,
-                name: decoded.name,
-                email: decoded.email,
-                role: decoded.role
-            }
+            user
         };
     } catch (error) {
         console.error(error);
