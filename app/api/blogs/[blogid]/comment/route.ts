@@ -44,6 +44,7 @@ export async function POST(
     };
     blog.comments.push(newComment);
     await blog.save();
+    await Blog.findByIdAndUpdate(blogId, { $inc: { commentsCount: 1 } });
     return NextResponse.json(
       { meesage: "Comment added successfully", comment: newComment },
       { status: 201 }

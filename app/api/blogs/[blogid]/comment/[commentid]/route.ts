@@ -102,6 +102,7 @@ export async function DELETE(
       (c: any) => c._id.toString() !== commentId
     );
     await blog.save();
+    await Blog.findByIdAndUpdate(blogId, { $inc: { commentsCount: -1 } });
     return NextResponse.json(
       { message: "Comment deleted successfully" },
       { status: 200 }

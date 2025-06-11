@@ -36,6 +36,14 @@ const BlogSchema = new Schema({
         type: Number,
         default: 0
     },
+    likedBy: [{ 
+        type: Schema.Types.ObjectId, 
+        ref: 'User'
+    }],
+    commmentsCount: {
+        type: Number,
+        default: 0  
+    },
     shares: {
         type: Number,
         default: 0
