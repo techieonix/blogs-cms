@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
 
     try {
         // Create and save a new blog
-        const blog = new Blog({});
+        const blog = new Blog({ authorId: authResponse.user._id });
         await blog.save();
 
         // Return a success response

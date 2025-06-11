@@ -50,9 +50,7 @@ const BlogSchema = new Schema({
     authorId: {
         type: Schema.Types.ObjectId,
         ref: "User",
-        required: function (this: any) {
-            return this.status === "Published";
-        }
+        required: [true, "Please provide the author ID"]
     }
 }, {
     timestamps: true
