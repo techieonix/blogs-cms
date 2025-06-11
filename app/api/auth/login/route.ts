@@ -43,6 +43,7 @@ export async function POST(request: Request) {
         );
 
         // Update user token
+        user.token = token;
         await user.save();
 
         // Return a success response with user details

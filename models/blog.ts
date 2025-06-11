@@ -47,7 +47,7 @@ const BlogSchema = new Schema({
         enum: ["Draft", "Published", "Archived"],
         default: "Draft"
     },
-    authorId: {
+    author: {
         type: Schema.Types.ObjectId,
         ref: "User",
         required: [true, "Please provide the author ID"]

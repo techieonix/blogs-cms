@@ -14,7 +14,7 @@ export const GET = async (request: NextRequest) => {
     try {
         // Fetch the blogs for the authenticated user
         const user = authResponse.user;
-        const blogs = await Blog.find({ authorId: user._id });
+        const blogs = await Blog.find({ author: user._id });
         if (!blogs || blogs.length === 0) {
             return NextResponse.json({ message: "No blogs found for this user" }, { status: 404 });
         }

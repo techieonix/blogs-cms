@@ -5,11 +5,11 @@ import mongoose from "mongoose";
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { blogid: string } }
+  { params }: { params: { blogId: string } }
 ) {
   await connectDB();
 
-  const blogId = await params.blogid;
+  const { blogId } = await params;
 
   let body;
   try {

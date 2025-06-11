@@ -4,13 +4,10 @@ import { Blog } from "@/models/blog";
 import mongoose from "mongoose";
 
 // Update a comment by ID
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: { blogid: string; commentid: string } }
-) {
+export async function PUT(request: NextRequest, { params }: { params: { blogId: string; commentid: string } }) {
   await connectDB();
 
-  const blogId = params.blogid;
+  const { blogId } = await params;
   const commentId = params.commentid;
 
   if (!mongoose.Types.ObjectId.isValid(blogId)) {
@@ -70,13 +67,10 @@ export async function PUT(
 }
 
 // Delete a comment by ID
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { blogid: string; commentid: string } }
-) {
+export async function DELETE(request: NextRequest, { params }: { params: { blogId: string; commentid: string } }) {
   await connectDB();
 
-  const blogId = params.blogid;
+  const { blogId } = await params;
   const commentId = params.commentid;
 
   if (!mongoose.Types.ObjectId.isValid(blogId)) {

@@ -3,12 +3,13 @@ import { Types } from "mongoose";
 
 import { connectDB } from "@/configs/database";
 import { Blog } from "@/models/blog";
+import selfOrAdmin from "@/middlewares/selfOrAdmin";
 
 
 // Get Blog by ID
-export async function GET(request: NextRequest, { params }: { params: { blogid: string } }) {
+export async function GET(request: NextRequest, { params }: { params: { blogId: string } }) {
     // Extract the blog ID
-    const blogId = await params.blogid;
+    const { blogId } = await params;
     if (!Types.ObjectId.isValid(blogId)) {
         return NextResponse.json({ error: "Invalid blog ID" }, { status: 400 });
     }
@@ -21,6 +22,12 @@ export async function GET(request: NextRequest, { params }: { params: { blogid: 
         const blog = await Blog.findById(blogId);
         if (!blog) {
             return NextResponse.json({ error: "No blog found with this ID" }, { status: 404 });
+        }
+
+        // Break if the blog is not published and the user is not the author or an admin
+        if (blog.status !== "Published") {
+            const authResponse = await selfOrAdmin(request, blog.author.toString());
+            if (!authResponse.success) return authResponse.response;
         }
 
         // Return the blog data
@@ -36,8 +43,8 @@ export async function GET(request: NextRequest, { params }: { params: { blogid: 
 
 
 //Edit Blog
-export async function PATCH(request: NextRequest, { params }: { params: { blogid: string } }) {
-    const blogId = await params.blogid;
+export async function PATCH(request: NextRequest, { params }: { params: { blogId: string } }) {
+    const { blogId } = await params;
 
     if (!Types.ObjectId.isValid(blogId)) {
         return NextResponse.json({ error: "Invalid blog ID" }, { status: 400 });
@@ -67,8 +74,8 @@ export async function PATCH(request: NextRequest, { params }: { params: { blogid
 
 
 // Delete Blog
-export async function DELETE(_: NextRequest, { params }: { params: { blogid: string } }) {
-    const blogId = await params.blogid;
+export async function DELETE(_: NextRequest, { params }: { params: { blogId: string } }) {
+    const { blogId } = await params;
 
     if (!Types.ObjectId.isValid(blogId)) {
         return NextResponse.json({ error: "Invalid blog ID" }, { status: 400 });

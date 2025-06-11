@@ -5,8 +5,8 @@ import { connectDB } from "@/configs/database";
 import { Blog } from "@/models/blog";
 
 
-export async function PUT(request: NextRequest, { params }: { params: { blogid: string } }) {
-  const blogId = params.blogid;
+export async function PUT(request: NextRequest, { params }: { params: { blogId: string } }) {
+  const { blogId } = await params;
 
   if (!mongoose.Types.ObjectId.isValid(blogId)) {
     return NextResponse.json({ error: "Invalid blog ID" }, { status: 400 });
