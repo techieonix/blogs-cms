@@ -74,9 +74,9 @@ export async function PATCH(request: NextRequest, { params }: { params: { blogId
 
 
 // Delete Blog
-export async function DELETE(_: NextRequest, { params }: { params: { blogId: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: { blogId: string } }) {
+    // Extract the blog ID
     const { blogId } = await params;
-
     if (!Types.ObjectId.isValid(blogId)) {
         return NextResponse.json({ error: "Invalid blog ID" }, { status: 400 });
     }
@@ -86,16 +86,22 @@ export async function DELETE(_: NextRequest, { params }: { params: { blogId: str
         await connectDB();
 
         // Delete the blog
-        const deletedBlog = await Blog.findByIdAndDelete(blogId);
-        if (!deletedBlog) {
-            return NextResponse.json({ error: "Blog not found" }, { status: 404 });
+        const blog = await Blog.findById(blogId);
+        if (!blog) {
+            return NextResponse.json({ error: "No blog found with this ID" }, { status: 404 });
         }
 
-        return NextResponse.json({ message: "Blog deleted successfully" }, { status: 200 });
+        // Authentication middleware
+        const authResponse = await selfOrAdmin(request, blog.author.toString());
+        if (!authResponse.success) return authResponse.response;
+
+        // Delete the blog
+        await blog.deleteOne();
+
+        // Return a success response
+        return NextResponse.json({ message: "The blog has been deleted successfully." }, { status: 200 });
     } catch (error) {
         console.error(error);
-
-        const errorMessage = error instanceof Error ? error.message : String(error);
-        return NextResponse.json({ error: errorMessage }, { status: 400 });
+        return NextResponse.json({ error: "Something went wrong. Please try again later or contact support at contact@techieonix.com" }, { status: 500 });
     }
 };
