@@ -42,7 +42,7 @@ export const BlogContentSchema = new Schema({
         buttonLabel: String,
         buttonUrl: String
     },
-    blog: {
+    blogId: {
         type: Schema.Types.ObjectId,
         ref: "Blog",
         required: [true, "Please provide the blog post this content belongs to"]
