@@ -53,6 +53,10 @@ const BlogSchema = new Schema({
         enum: ["Draft", "Published", "Archived"],
         default: "Draft"
     },
+    comments: [{
+        type: Schema.Types.ObjectId,
+        ref: "Comment"
+    }],
     authorId: {
         type: Schema.Types.ObjectId,
         ref: "User",

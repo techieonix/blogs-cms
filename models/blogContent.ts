@@ -42,11 +42,11 @@ export const BlogContentSchema = new Schema({
         buttonLabel: String,
         buttonUrl: String
     },
-    // blog: {
-    //     type: Schema.Types.ObjectId,
-    //     ref: "Blog",
-    //     required: [true, "Please provide the blog post this content belongs to"]
-    // }
+    blog: {
+        type: Schema.Types.ObjectId,
+        ref: "Blog",
+        required: [true, "Please provide the blog post this content belongs to"]
+    }
 });
 
 export const BlogContent = models.BlogContent || model("BlogContent", BlogContentSchema);
