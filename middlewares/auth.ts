@@ -33,16 +33,17 @@ export default function (allowedRoles: string[]) {
                 };
             }
 
-            // Database Connection
-            await connectDB();
+            // // Database Connection
+            // await connectDB();
 
-            const user = await User.findOne({ _id: decoded.id, isActive: true });
-            if (!user) {
-                return {
-                    success: false,
-                    response: NextResponse.json({ message: "User not found or inactive. Please log in again to continue or contact support at contact@techieonix.com." }, { status: 404 })
-                };
-            }
+            // // Check if user exists and is active
+            // const user = await User.findOne({ _id: decoded.id, isActive: true });
+            // if (!user) {
+            //     return {
+            //         success: false,
+            //         response: NextResponse.json({ message: "User not found or inactive. Please log in again to continue or contact support at contact@techieonix.com." }, { status: 404 })
+            //     };
+            // }
 
             console.log("Authentication successful");
             return {
@@ -59,7 +60,7 @@ export default function (allowedRoles: string[]) {
             console.error(error);
             return {
                 success: false,
-                response: NextResponse.json({ message: "Invalid or expired token" }, { status: 401 })
+                response: NextResponse.json({ message: "Invalid or expired token. Please log in again to continue." }, { status: 401 })
             };
         }
     };
