@@ -1,16 +1,23 @@
 import { NextResponse, NextRequest } from "next/server";
+
 import { Blog } from "@/models/blog";
 import { connectDB } from "@/configs/database";
+import auth from "@/middlewares/auth";
 
 
-// Get all blogs
-export async function GET(request: NextResponse) {
+const getMiddleware = auth(["admin", "viewer", "author"]);
+const postMiddleware = auth(["admin", "author"]);
+
+
+// Get all published blogs
+export async function GET(request: NextRequest) {
+    // Authentication middleware
+    const authResponse = await getMiddleware(request);
+    if (!authResponse.success) return authResponse.response;
+
     try {
-        // Database connection
-        await connectDB();
-
         // Fetch all blogs
-        const blogs = await Blog.find();
+        const blogs = await Blog.find({ status: "Published" });
         if (!blogs || blogs.length === 0) {
             return NextResponse.json({ message: "No blogs found" }, { status: 404 });
         }
@@ -28,14 +35,13 @@ export async function GET(request: NextResponse) {
 
 // Create a new blog
 export async function POST(request: NextRequest) {
-    const body = await request.json();
+    // Authentication middleware
+    const authResponse = await postMiddleware(request);
+    if (!authResponse.success) return authResponse.response;
 
     try {
-        // Database connection
-        await connectDB();
-
         // Create and save a new blog
-        const blog = new Blog(body);
+        const blog = new Blog({});
         await blog.save();
 
         // Return a success response

@@ -4,28 +4,30 @@ import { BlogContentSchema } from "@/models/blogContent";
 const BlogSchema = new Schema({
     title: {
         type: String,
-        required: [true, "Please provide a title for the blog post"],
+        required: function (this: any) {
+            return this.status === "Published";
+        },
         trim: true
     },
     thumbnail: String, // TBD
     category: {
         type: String,
-        required: [true, "Please provide the category of the blog post"]
+        required: function (this: any) {
+            return this.status === "Published";
+        }
     },
     content: {
         type: BlogContentSchema,
-        required: [true, "Please provide the content for the blog post"]
+        required: function (this: any) {
+            return this.status === "Published";
+        }
     },
     publishedDate: Date,
     lastUpdateDate: Date,
     tags: {
         type: [String],
-        required: [true, "Please provide at least one tag for the blog post"],
-        validate: {
-            validator: function (v: string[]) {
-                return v.length > 0;
-            },
-            message: "Please provide at least one tag for the blog post"
+        required: function (this: any) {
+            return this.status === "Published";
         }
     },
     views: {
@@ -48,7 +50,9 @@ const BlogSchema = new Schema({
     authorId: {
         type: Schema.Types.ObjectId,
         ref: "User",
-        required: true
+        required: function (this: any) {
+            return this.status === "Published";
+        }
     }
 }, {
     timestamps: true
